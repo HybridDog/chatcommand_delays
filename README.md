@@ -3,7 +3,8 @@
 This mod tells the time a chatcommand took to get executed.  
 So for example if you want to know how long it takes to set 100x100x100 nodes using worldedit,  
 you only need to have this mod, it automatically adds the delay to the message sent to the player (if no message is returned, the delay gets sent in an own line).  
-Currently the time is added in brackets at the end of the message.
+Currently the time is added in brackets at the end of the message.  
+If the delay is very short, e.g. when you just teleport somewhere, the time isn't added to not cause spamming.
 
 **Depends:** see [depends.txt](https://raw.githubusercontent.com/HybridDog/chatcommand_delays/master/depends.txt)  
 **License:** see [LICENSE.txt](https://raw.githubusercontent.com/HybridDog/chatcommand_delays/master/LICENSE.txt)  
