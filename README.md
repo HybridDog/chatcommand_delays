@@ -13,7 +13,7 @@ Obviously Worldedit doesn't use minetest.register_chatcommand correctly
 setting about 2.5 mio nodes may take longer for you, I use my own worldedit modifications  
 ![I'm a screenshot!](https://cloud.githubusercontent.com/assets/3192173/15223716/1dbe7632-1876-11e6-9f1c-1e8178b11e96.png)
 
-It works with every chatcommand, e.g. the one of function delayer:  
+It works with every chatcommand, e.g. the one of cave_lighting:  
 ![I'm a screenshot!](https://cloud.githubusercontent.com/assets/3192173/15223395/7e263b42-1874-11e6-864a-98c18ff9df00.png)
 
 If you got ideas or found bugs, please tell them to me.
