@@ -27,7 +27,8 @@ minetest.registered_on_chat_messages[1] = function(name, message)
 		-- ## and here
 		local delay = (minetest.get_us_time()-t1)/1000000
 		if delay > treshold then
-			message = (message or "") .. " (" .. delay .. " s)"
+			--message = (message or "") .. " (" .. delay .. " s)"
+			message = (message or "") .. minetest.colorize("#f3d2ff", " (" .. delay .. " s)")
 			--" Chatcommand executed after " .. delay .. " seconds."
 		end
 		-- ##
