@@ -1,18 +1,27 @@
-local load_time_start = minetest.get_us_time()
-
-
 -- only tell the time if the chatcommand took noticeable time
-local treshold = 0.01
+local time_threshold = 0.01
 
--- Override the chatcommand function of builtin to tell the time the command took
+local message_form = "%s " .. minetest.colorize("#f3d2ff", "(%.3g s)")
+
+-- Override the chatcommand function of builtin to tell the time the command
+-- took; this must always be kept up to date
 minetest.registered_on_chat_messages[1] = function(name, message)
-	local cmd, param = string.match(message, "^/([^ ]+) *(.*)")
-	if not param then
-		param = ""
+	if message:sub(1,1) ~= "/" then
+		return
 	end
-	local cmd_def = core.chatcommands[cmd]
+
+	local cmd, param = string.match(message, "^/([^ ]+) *(.*)")
+	if not cmd then
+		core.chat_send_player(name, "-!- Empty command")
+		return true
+	end
+
+	param = param or ""
+
+	local cmd_def = core.registered_chatcommands[cmd]
 	if not cmd_def then
-		return false
+		core.chat_send_player(name, "-!- Invalid command: " .. cmd)
+		return true
 	end
 	local has_privs, missing_privs = core.check_player_privs(name, cmd_def.privs)
 	if has_privs then
@@ -22,19 +31,25 @@ minetest.registered_on_chat_messages[1] = function(name, message)
 		local t1 = minetest.get_us_time()
 		-- ##
 
-		local success, message = cmd_def.func(name, param)
+		local success, result = cmd_def.func(name, param)
 
 		-- ## and here
-		local delay = (minetest.get_us_time()-t1)/1000000
-		if delay > treshold then
-			--message = (message or "") .. " (" .. delay .. " s)"
-			message = (message or "") .. minetest.colorize("#f3d2ff", " (" .. delay .. " s)")
-			--" Chatcommand executed after " .. delay .. " seconds."
+		local delay = (minetest.get_us_time() - t1) / 1000000
+		if delay > time_threshold then
+			result = message_form:format((result or ""), delay)
 		end
 		-- ##
 
-		if message then
-			core.chat_send_player(name, message)
+		-- This is copy-pasted from a PR; it adds negligible changes
+		if success == false and result == "/help" then
+			core.chat_send_player(name, "-!- Invalid command usage")
+			local help_def = core.registered_chatcommands["help"]
+			local _, helpmsg = help_def.func(name, cmd)
+			if helpmsg then
+				core.chat_send_player(name, helpmsg)
+			end
+		elseif result then
+			core.chat_send_player(name, result)
 		end
 	else
 		core.chat_send_player(name, "You don't have permission"
@@ -42,13 +57,4 @@ minetest.registered_on_chat_messages[1] = function(name, message)
 				.. table.concat(missing_privs, ", ") .. ")")
 	end
 	return true  -- Handled chat message
-end
-
-
-local time = (minetest.get_us_time() - load_time_start) / 1000000
-local msg = "[chatcommand_delays] loaded after ca. " .. time .. " seconds."
-if time > 0.01 then
-	print(msg)
-else
-	minetest.log("info", msg)
 end
