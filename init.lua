@@ -18,6 +18,11 @@ minetest.registered_on_chat_messages[1] = function(name, message)
 
 	param = param or ""
 
+	-- Run core.registered_on_chatcommands callbacks.
+	if core.run_callbacks(core.registered_on_chatcommands, 5, name, cmd, param) then
+		return true
+	end
+
 	local cmd_def = core.registered_chatcommands[cmd]
 	if not cmd_def then
 		core.chat_send_player(name, "-!- Invalid command: " .. cmd)
@@ -40,13 +45,14 @@ minetest.registered_on_chat_messages[1] = function(name, message)
 		end
 		-- ##
 
-		-- This is copy-pasted from a PR; it adds negligible changes
-		if success == false and result == "/help" then
+		if success == false and result == nil then
 			core.chat_send_player(name, "-!- Invalid command usage")
 			local help_def = core.registered_chatcommands["help"]
-			local _, helpmsg = help_def.func(name, cmd)
-			if helpmsg then
-				core.chat_send_player(name, helpmsg)
+			if help_def then
+				local _, helpmsg = help_def.func(name, cmd)
+				if helpmsg then
+					core.chat_send_player(name, helpmsg)
+				end
 			end
 		elseif result then
 			core.chat_send_player(name, result)
